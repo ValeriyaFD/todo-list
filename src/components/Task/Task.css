@@ -1,0 +1,31 @@
+.todo-list li .icon {
+	width: 30px;
+	height: 40px;
+	font-size: 34px;
+	color: #cc9a9a;
+	margin: auto 0;
+	transition: color 0.2s ease-out;
+	cursor: pointer;
+}
+.todo-list li .icon:hover {
+	color: #af5b5e;
+}
+.todo-list li .icon-pause,
+.todo-list li .icon-play {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+}
+
+.icon-pause:after {
+	content: '⏸';
+}
+
+.icon-play:after {
+	content: '▶';
+}
+.todo-list li label div.timer {
+	font-size: 13px;
+  color: gray;
+ 
+  }
