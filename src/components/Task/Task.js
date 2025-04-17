@@ -7,11 +7,13 @@ import './Task.css';
 export default class Task extends Component {
   constructor(props) {
     super(props);
+    const { description } = props.todo;
     this.state = {
-      localDescription: this.props.todo.description,
+      localDescription: description,
     };
     this.inputRef = React.createRef();
   }
+
   componentDidUpdate(prevProps) {
     if (this.props.todo.onEditing && !prevProps.todo.onEditing) {
       this.inputRef.current.focus();
@@ -50,11 +52,11 @@ export default class Task extends Component {
   handleChange = (event) => {
     this.setState({ localDescription: event.target.value });
   };
-
+  
   render() {
-    const { todo, onDelete, onToggleDone } = this.props;
-    const { id, description, date, completed, onEditing } = todo;
-    const { localDescription } = this.state;
+    const { todo, onDelete, onToggleDone, onStartTimer, onPauseTimer, onStopTimer } = this.props;
+    const { id, description, date, completed, onEditing} = todo;
+ 
     return (
       <li className={`${completed ? 'completed' : onEditing ? 'editing' : ''}`}>
         <div className="view">
@@ -62,15 +64,17 @@ export default class Task extends Component {
             className="toggle"
             type="checkbox"
             checked={completed}
-            onChange={() => onToggleDone(id)}
+            onChange={() => { onToggleDone(id);
+              if (!completed) onStopTimer(id);
+            }}
             id={`task-checkbox-${id}`}
           />
           <label htmlFor={`task-checkbox-${id}`}>
             <span className="description">{description}</span>
             <div className="timer">
-                  <button className="icon icon-play"></button>
-                  <button className="icon icon-pause"></button>
-                  <span className='time'>20:31</span>
+                  <button className="icons icon-play" onClick={() => onStartTimer(id)}></button>
+                  <button className="icons icon-pause" onClick={() => onPauseTimer(id)}></button>
+                  <span className='time'>{todo.minutes}:{todo.seconds}</span>
             </div>
             <span className="created">
               created&nbsp;
@@ -89,7 +93,7 @@ export default class Task extends Component {
             ref={this.inputRef}
             type="text"
             className="edit"
-            value={localDescription}
+            value={this.state.localDescription}
             onChange={this.handleChange}
             onKeyDown={this.handleKeyDown}
             onBlur={this.handleBlur}
@@ -100,6 +104,7 @@ export default class Task extends Component {
   }
 }
 
+
 Task.propTypes = {
   todo: PropTypes.shape({
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
@@ -107,11 +112,16 @@ Task.propTypes = {
     date: PropTypes.instanceOf(Date).isRequired,
     completed: PropTypes.bool.isRequired,
     onEditing: PropTypes.bool.isRequired,
+    minutes: PropTypes.number.isRequired,
+    seconds: PropTypes.number.isRequired,
   }).isRequired,
   onDelete: PropTypes.func,
   onEdit: PropTypes.func,
   onToggleDone: PropTypes.func,
   onSave: PropTypes.func,
+  onStartTimer: PropTypes.func.isRequired,
+  onPauseTimer: PropTypes.func.isRequired,
+  onStopTimer: PropTypes.func.isRequired,
 };
 
 Task.defaultProps = {

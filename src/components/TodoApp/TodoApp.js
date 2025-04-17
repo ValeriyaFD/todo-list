@@ -9,7 +9,16 @@ export default class TodoApp extends Component {
     todoData: [],
     filter: 'all',
     maxId: 100,
+    timers: {}
   };
+
+  componentWillUnmount() {
+    Object.values(this.state.timers).forEach(timer => {
+      if (timer && timer.intervalId) {
+        clearInterval(timer.intervalId);
+      }
+    });
+  }
 
   deleteItem = (id) => {
     this.setState(({ todoData }) => {
@@ -20,12 +29,14 @@ export default class TodoApp extends Component {
     });
   };
 
-  addItem = (text) => {
+  addItem = (text, minutes, seconds) => {
     const { maxId } = this.state;
     const newItem = {
       description: text,
       completed: false,
       onEditing: false,
+      minutes: String(minutes).padStart(2, '0'),
+      seconds: String(seconds).padStart(2, '0'),
       date: new Date(),
       id: maxId + 1,
     };
@@ -37,10 +48,21 @@ export default class TodoApp extends Component {
   };
 
   deleteCompleted = () => {
-    this.setState(({ todoData }) => {
+    this.setState(({ todoData, timers }) => {
       const newArray = todoData.filter((todo) => !todo.completed);
+
+      const newTimers = Object.keys(timers).reduce((acc, key) => {
+        if (newArray.some((todo) => todo.id === Number(key))) {
+          acc[key] = timers[key];
+        } else if (timers[key].intervalId) {
+          clearInterval(timers[key].intervalId);
+        }
+        return acc;
+      }, {});
+
       return {
         todoData: newArray,
+        timers: newTimers,
       };
     });
   };
@@ -63,11 +85,12 @@ export default class TodoApp extends Component {
     this.setState(({ todoData }) => ({
       todoData: todoData.map((item) => {
         if (item && item.id === id) {
-          return { ...item, completed: !item.completed };
+          return { ...item, completed: !item.completed, minutes:'00', seconds:'00'};
         }
         return item;
       }),
     }));
+    this.stopTimer(id);
   };
 
   editItem = (id) => {
@@ -91,10 +114,125 @@ export default class TodoApp extends Component {
     }));
   };
 
+// Здесь реализую запуск таймера
+startTimer = (id) => {
+  this.setState((prevState) => {
+    const todo = prevState.todoData.find((t) => t.id === id);
+
+    const totalSeconds = parseInt(todo.minutes) * 60 + parseInt(todo.seconds);
+
+    const intervalId = setInterval(() => {
+      this.setState((prev) => {
+        const currentTimer = prev.timers[id];
+        if (!currentTimer || !currentTimer.isRunning) {
+          clearInterval(intervalId);
+          return null;
+        }
+
+        let newTotalSeconds = currentTimer.totalSeconds - 0.5;
+
+        if (newTotalSeconds <= 0) {
+          clearInterval(intervalId);
+          return {
+            timers: {
+              ...prev.timers,
+              [id]: {
+                ...currentTimer,
+                isRunning: false,
+                intervalId: null,
+                totalSeconds: 0,
+              },
+            },
+            todoData: prev.todoData.map((item) =>
+              item.id === id ? { ...item, minutes: '00', seconds: '00' } : item
+            ),
+          };
+        }
+
+        const newMinutes = Math.floor(newTotalSeconds / 60);
+        const newSeconds = newTotalSeconds % 60;
+
+        return {
+          timers: {
+            ...prev.timers,
+            [id]: {
+              ...currentTimer,
+              totalSeconds: newTotalSeconds,
+            },
+          },
+          todoData: prev.todoData.map((item) =>
+            item.id === id
+              ? {
+                  ...item,
+                  minutes: String(newMinutes).padStart(2, '0'),
+                  seconds: String(newSeconds).padStart(2, '0'),
+                }
+              : item
+          ),
+        };
+      });
+    }, 1000);
+
+    return {
+      timers: {
+        ...prevState.timers,
+        [id]: {
+          isRunning: true,
+          intervalId,
+          totalSeconds,
+        },
+      },
+    };
+  });
+};
+
+pauseTimer = (id) => {
+  this.setState((prevState) => {
+    const timer = prevState.timers[id];
+
+    clearInterval(timer.intervalId);
+    return {
+      timers: {
+        ...prevState.timers,
+        [id]: {
+          ...timer,
+          isRunning: false,
+          intervalId: null,
+        },
+      },
+    };
+  });
+};
+
+stopTimer = (id) => {
+  this.setState((prevState) => {
+    const timer = prevState.timers[id];
+
+    if (timer.intervalId) {
+      clearInterval(timer.intervalId);
+    }
+
+    return {
+      timers: {
+        ...prevState.timers,
+        [id]: {
+          isRunning: false,
+          intervalId: null,
+          totalSeconds: 0,
+        },
+      },
+      todoData: prevState.todoData.map((item) =>
+        item.id === id ? { ...item, minutes: '00', seconds: '00' } : item
+      ),
+    };
+  });
+};
+
   render() {
-    const { todoData, filter } = this.state;
+    const { todoData, filter, timers } = this.state;
     const visibleTodos = this.filter(todoData, filter);
     const doneCount = todoData.filter((el) => !el.completed).length;
+
     return (
       <section className="todoapp">
         <header>
@@ -108,6 +246,10 @@ export default class TodoApp extends Component {
           onDelete={this.deleteItem}
           onToggleDone={this.onToggleDone}
           onSave={this.handleSave}
+          timers={timers}
+          onStartTimer={this.startTimer}
+          onPauseTimer={this.pauseTimer}
+          onStopTimer={this.stopTimer}
         />
         <Footer
           done={doneCount}

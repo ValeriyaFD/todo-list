@@ -1,4 +1,4 @@
-.todo-list li .icon {
+.todo-list li .icons {
 	width: 30px;
 	height: 40px;
 	font-size: 34px;
@@ -6,6 +6,9 @@
 	margin: auto 0;
 	transition: color 0.2s ease-out;
 	cursor: pointer;
+	display: flex; 
+  	align-items: flex-end; 
+  	justify-content: flex-start;
 }
 .todo-list li .icon:hover {
 	color: #af5b5e;
@@ -24,8 +27,17 @@
 .icon-play:after {
 	content: '▶';
 }
-.todo-list li label div.timer {
+
+.timer {
 	font-size: 13px;
-  color: gray;
- 
+	color: gray;
+	display: grid;
+	grid-template-columns: 0.5fr 0.5fr 1fr;
+	gap: 7px;
+	align-items: center ;
+	vertical-align: baseline;
   }
+  
+.time{
+	display: block;
+}

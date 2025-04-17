@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 export default class NewTaskForm extends Component {
   state = {
     label: '',
+    minutes: '',
+    seconds: '',
   };
 
   onLabelChange = (e) => {
@@ -12,15 +14,38 @@ export default class NewTaskForm extends Component {
       label: e.target.value,
     });
   };
+  
+  onMinutesChange = (e) => {
+    this.setState({
+      minutes: e.target.value,
+    });
+  };
+
+  onSecondsChange = (e) => {
+    if(e.target.value.length > 2 || Number(e.target.value) > 59){
+      this.setState({
+        seconds: ''
+      })
+      } else {
+        this.setState({
+          seconds: e.target.value,
+        });
+      }
+  };
 
   onSubmit = (e) => {
     e.preventDefault();
-    const { label } = this.state;
+    const { label, minutes, seconds } = this.state;
+    if (minutes.length === 0 || seconds.length === 0) {
+      return
+    }
     if (label.trim() !== '') {
       const { addItem } = this.props;
-      addItem(label);
+      addItem(label, minutes, seconds);
       this.setState({
         label: '',
+        minutes: '',
+        seconds: '',
       });
     }
   };
@@ -32,19 +57,32 @@ export default class NewTaskForm extends Component {
   };
 
   render() {
-    const { label } = this.state;
+    const { label, minutes, seconds } = this.state;
     return (
-      <form class="new-todo-form">
-          <input className="new-todo"
+      <form className="new-todo-form">
+        <input
+          className="new-todo"
           placeholder="What needs to be done?"
           type="text"
           onKeyDown={this.onKeyDown}
           onChange={this.onLabelChange}
-          value={label} />
-          <input className="new-todo-form__timer" placeholder="Min" autofocus />
-          <input className="new-todo-form__timer" placeholder="Sec" autofocus />
-        </form>
-      
+          value={label}
+        />
+        <input
+          className="new-todo-form__timer"
+          type="number"
+          placeholder="Min"
+          value={minutes}
+          onChange={this.onMinutesChange}
+        />
+        <input
+          className="new-todo-form__timer"
+          type="number"
+          placeholder="Sec"
+          value={seconds}
+          onChange={this.onSecondsChange}
+        />
+      </form>
     );
   }
 }
