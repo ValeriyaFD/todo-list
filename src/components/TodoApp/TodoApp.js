@@ -129,7 +129,7 @@ startTimer = (id) => {
           return null;
         }
 
-        let newTotalSeconds = currentTimer.totalSeconds - 0.5;
+        let newTotalSeconds = currentTimer.totalSeconds - 1;
 
         if (newTotalSeconds <= 0) {
           clearInterval(intervalId);
