@@ -208,7 +208,7 @@ stopTimer = (id) => {
   this.setState((prevState) => {
     const timer = prevState.timers[id];
 
-    if (timer.intervalId) {
+    if (timer && timer.intervalId) {
       clearInterval(timer.intervalId);
     }
 
