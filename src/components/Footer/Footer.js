@@ -1,23 +1,38 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import TaskFilter from '../TaskFilter/TaskFilter';
 import './Footer.css';
+import TasksFilter from '../TasksFilter/TasksFilter';
+import PropTypes from 'prop-types';
 
-export default function Footer({ done, deleteCompleted, filter, onFilterChange }) {
-  return (
-    <footer className="footer">
-      <span className="todo-count">{`${done} items left`}</span>
-      <TaskFilter filter={filter} onFilterChange={onFilterChange} />
-      <button className="clear-completed" type="button" onClick={deleteCompleted}>
-        Clear completed
-      </button>
-    </footer>
-  );
+export default function Footer ({todos, setTodos, onTodoFiltered}) {
+  const todosCount = todos.filter((todo) => !todo.completed).length;
+
+  const deleteAll = () => {
+    setTodos(todos.filter((todo) => !todo.completed));
+  }
+
+
+    return (
+      <footer className="footer">
+        <span className="todo-count">{`${todosCount} items left`}</span>
+        <TasksFilter todos={todos} setTodos={setTodos} onTodoFiltered ={onTodoFiltered} />
+        <button className="clear-completed" onClick={deleteAll}>Clear completed</button>
+      </footer>
+    )
 }
 
 Footer.propTypes = {
-  done: PropTypes.number.isRequired,
-  deleteCompleted: PropTypes.func.isRequired,
-  filter: PropTypes.string.isRequired,
-  onFilterChange: PropTypes.func.isRequired,
-};
+  todos: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      description: PropTypes.string.isRequired,
+      completed: PropTypes.bool,
+      date: PropTypes.instanceOf(Date).isRequired,
+      onEditing: PropTypes.bool.isRequired,
+    }).isRequired
+  ).isRequired,
+  setTodos: PropTypes.func.isRequired,
+  onTodoFiltered: PropTypes.func.isRequired,
+}
+
+Footer.defaultProps = {
+  todos: [],
+}

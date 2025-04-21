@@ -36,7 +36,6 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 	font-weight: 300;
 }
-
 :focus {
 	outline: 0;
 }
@@ -44,6 +43,7 @@ body {
 .hidden {
 	display: none;
 }
+
 .main {
 	position: relative;
 	z-index: 2;
