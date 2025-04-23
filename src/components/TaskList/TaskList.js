@@ -23,7 +23,7 @@ export default function TaskList({ todos, onToggleCompleted, onEdit, onDelete, o
                 <input
                   type="text"
                   className="edit"
-                  value={todo.editingText || todo.description}
+                  value={todo.editingText}
                   onChange={(e) => {
                     setTodos(todos.map((t) => (t.id === todo.id ? { ...t, editingText: e.target.value } : t)));
                   }}
