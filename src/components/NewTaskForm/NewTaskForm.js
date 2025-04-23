@@ -1,17 +1,17 @@
-import "./NewTaskForm.css";
-import { useState } from "react";
+import './NewTaskForm.css';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 export default function NewTaskForm({ todos, setTodos, nextId, setNextId }) {
-  const [newTaskDescription, setNewTaskDescription] = useState("");
+  const [newTaskDescription, setNewTaskDescription] = useState('');
 
   const newTaskDescriptionText = (ev) => {
     setNewTaskDescription(ev.target.value);
   };
 
   const handleKeyDown = (event) => {
-    if (event.key === "Enter") {
-      if (newTaskDescription.trim() !== "") {
+    if (event.key === 'Enter') {
+      if (newTaskDescription.trim() !== '') {
         const newTodo = {
           id: nextId,
           description: newTaskDescription,
@@ -21,7 +21,7 @@ export default function NewTaskForm({ todos, setTodos, nextId, setNextId }) {
         };
         setTodos([...todos, newTodo]);
         setNextId(nextId + 1);
-        setNewTaskDescription("");
+        setNewTaskDescription('');
       }
     }
   };
@@ -32,7 +32,6 @@ export default function NewTaskForm({ todos, setTodos, nextId, setNextId }) {
       <input
         className="new-todo"
         placeholder="What needs to be done?"
-        autoFocus
         type="text"
         value={newTaskDescription}
         onChange={newTaskDescriptionText}
@@ -44,18 +43,18 @@ export default function NewTaskForm({ todos, setTodos, nextId, setNextId }) {
 
 NewTaskForm.propTypes = {
   todos: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-        description: PropTypes.string.isRequired,
-        completed: PropTypes.bool,
-        date: PropTypes.instanceOf(Date).isRequired,
-        onEditing: PropTypes.bool.isRequired,
-      }).isRequired
-    ).isRequired,
-    setTodos: PropTypes.func.isRequired,
-    nextId: PropTypes.number.isRequired,
-    setNextId: PropTypes.func.isRequired,
-}
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      description: PropTypes.string.isRequired,
+      completed: PropTypes.bool,
+      date: PropTypes.instanceOf(Date).isRequired,
+      onEditing: PropTypes.bool.isRequired,
+    }).isRequired
+  ).isRequired,
+  setTodos: PropTypes.func.isRequired,
+  nextId: PropTypes.number.isRequired,
+  setNextId: PropTypes.func.isRequired,
+};
 // первоначальное состояние
 
 // export default function NewTaskForm() {

@@ -1,42 +1,38 @@
-import { useState, useEffect } from "react";
-import NewTaskForm from "../NewTaskForm/NewTaskForm";
-import TaskList from "../TaskList/TaskList";
-import Footer from "../Footer/Footer";
-import "./TodoApp.css";
+import React, { useState, useEffect } from 'react';
+import NewTaskForm from '../NewTaskForm/NewTaskForm';
+import TaskList from '../TaskList/TaskList';
+import Footer from '../Footer/Footer';
+import './TodoApp.css';
 
 export default function TodoApp() {
   const [todos, setTodos] = useState([]);
   const [nextId, setNextId] = useState(1);
   const [filtered, setFiltered] = useState(todos);
-  const [newTaskText, setNewTaskText] = useState("");
+  const [newTaskText, setNewTaskText] = useState('');
 
   const newText = (ev) => {
     setNewTaskText(ev.target.value);
   };
 
   const saveDescription = (todoId, event) => {
-    if (event.key === "Enter") {
+    if (event.key === 'Enter') {
       setTodos(
         todos.map((todo) =>
-          todo.id === todoId
-            ? { ...todo, description: event.target.value, onEditing: false }
-            : todo
+          todo.id === todoId ? { ...todo, description: event.target.value, onEditing: false } : todo
         )
       );
-      setNewTaskText("");
-    } else if (event.key === "Escape") {
+      setNewTaskText('');
+    } else if (event.key === 'Escape') {
       setTodos(
-        todos.map((todo) =>
-          todo.id === todoId ? { ...todo, onEditing: false } : todo
-        )
+        todos.map((todo) => (todo.id === todoId ? { ...todo, description: todo.description, onEditing: false } : todo))
       );
     }
   };
 
   const todoFiltered = (filter) => {
-    if (filter === "Active") {
+    if (filter === 'Active') {
       setFiltered(todos.filter((el) => !el.completed));
-    } else if (filter === "Completed") {
+    } else if (filter === 'Completed') {
       setFiltered(todos.filter((el) => el.completed));
     } else {
       setFiltered(todos);
@@ -48,26 +44,16 @@ export default function TodoApp() {
   }, [todos]);
 
   const toggleCompleted = (id) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
-    );
+    setTodos(todos.map((todo) => (todo.id === id ? { ...todo, completed: !todo.completed } : todo)));
   };
 
-  ////////////////
   const editTask = (id) => {
     setTodos(
       todos.map((todo) =>
-        todo.id === id ? { ...todo, onEditing: true } : todo
+        todo.id === id ? { ...todo, onEditing: true, editingText: todo.description } : { ...todo, onEditing: false }
       )
     );
-    const taskToEdit = todos.find((todo) => todo.id === id);
-    if (taskToEdit) {
-      setNewTaskText(taskToEdit.description);
-    }
   };
-  //////////////////////
 
   const deleteTask = (id) => {
     setTodos(todos.filter((todo) => todo.id !== id));
@@ -75,12 +61,7 @@ export default function TodoApp() {
 
   return (
     <section className="todoapp">
-      <NewTaskForm
-        todos={todos}
-        setTodos={setTodos}
-        nextId={nextId}
-        setNextId={setNextId}
-      />
+      <NewTaskForm todos={todos} setTodos={setTodos} nextId={nextId} setNextId={setNextId} />
       <TaskList
         todos={filtered}
         newText={newText}
@@ -90,12 +71,9 @@ export default function TodoApp() {
         onEdit={editTask}
         onDelete={deleteTask}
         onSaveDescription={saveDescription}
-      />
-      <Footer
-        todos={filtered}
         setTodos={setTodos}
-        onTodoFiltered={todoFiltered}
       />
+      <Footer todos={filtered} setTodos={setTodos} onTodoFiltered={todoFiltered} />
     </section>
   );
 }
