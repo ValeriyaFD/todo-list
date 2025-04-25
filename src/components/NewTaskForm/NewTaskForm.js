@@ -73,6 +73,7 @@ export default class NewTaskForm extends Component {
           type="number"
           placeholder="Min"
           value={minutes}
+          onKeyDown={this.onKeyDown}
           onChange={this.onMinutesChange}
         />
         <input
@@ -80,6 +81,7 @@ export default class NewTaskForm extends Component {
           type="number"
           placeholder="Sec"
           value={seconds}
+          onKeyDown={this.onKeyDown}
           onChange={this.onSecondsChange}
         />
       </form>
