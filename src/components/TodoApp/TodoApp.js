@@ -121,6 +121,10 @@ startTimer = (id) => {
 
     const totalSeconds = parseInt(todo.minutes) * 60 + parseInt(todo.seconds);
 
+    if (prevState.timers[id]?.isRunning) {
+      return null;
+    }
+
     const intervalId = setInterval(() => {
       this.setState((prev) => {
         const currentTimer = prev.timers[id];
@@ -189,6 +193,7 @@ startTimer = (id) => {
 pauseTimer = (id) => {
   this.setState((prevState) => {
     const timer = prevState.timers[id];
+    if (!timer || !timer.isRunning) return null;
 
     clearInterval(timer.intervalId);
     return {
@@ -207,6 +212,7 @@ pauseTimer = (id) => {
 stopTimer = (id) => {
   this.setState((prevState) => {
     const timer = prevState.timers[id];
+    if (!timer) return null;
 
     if (timer && timer.intervalId) {
       clearInterval(timer.intervalId);
